@@ -17,8 +17,16 @@ local selectedPlayer = nil
 local following = false
 local followConnection = nil
 
+-- Velocidade do tween de seguir
+-- 0.01 = muito lento
+-- 0.05 = lento
+-- 0.10 = médio
+-- 0.20 = rápido
+-- 0.50 = muito rápido
+local TweenSpeed = 0.05
+
 --==================================================
--- SCREEN GUI
+-- GUI
 --==================================================
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -27,16 +35,10 @@ ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.Parent = PlayerGui
 
---==================================================
--- FUNÇÃO CORNER
---==================================================
-
 local function AddCorner(object, radius)
-
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, radius)
 	corner.Parent = object
-
 end
 
 --==================================================
@@ -44,46 +46,28 @@ end
 --==================================================
 
 local ToggleButton = Instance.new("TextButton")
-
-ToggleButton.Name = "ToggleButton"
 ToggleButton.Size = UDim2.fromOffset(55, 55)
 ToggleButton.Position = UDim2.new(0, 20, 0.5, -27)
-
-ToggleButton.BackgroundColor3 =
-	Color3.fromRGB(30, 30, 35)
-
+ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
 ToggleButton.BorderSizePixel = 0
-
 ToggleButton.Text = "≡"
-ToggleButton.TextColor3 =
-	Color3.fromRGB(255, 255, 255)
-
+ToggleButton.TextColor3 = Color3.new(1, 1, 1)
 ToggleButton.TextSize = 25
 ToggleButton.Font = Enum.Font.GothamBold
-
 ToggleButton.Parent = ScreenGui
 
 AddCorner(ToggleButton, 100)
 
 --==================================================
--- JANELA PRINCIPAL
+-- JANELA
 --==================================================
 
 local MainFrame = Instance.new("Frame")
-
-MainFrame.Name = "MainFrame"
-
-MainFrame.Size = UDim2.fromOffset(360, 430)
-
-MainFrame.Position =
-	UDim2.new(0.5, -180, 0.5, -215)
-
-MainFrame.BackgroundColor3 =
-	Color3.fromRGB(24, 24, 30)
-
+MainFrame.Size = UDim2.fromOffset(360, 450)
+MainFrame.Position = UDim2.new(0.5, -180, 0.5, -225)
+MainFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 30)
 MainFrame.BorderSizePixel = 0
 MainFrame.Visible = false
-
 MainFrame.Parent = ScreenGui
 
 AddCorner(MainFrame, 14)
@@ -93,23 +77,14 @@ AddCorner(MainFrame, 14)
 --==================================================
 
 local Title = Instance.new("TextLabel")
-
 Title.Size = UDim2.new(1, -20, 0, 45)
 Title.Position = UDim2.fromOffset(10, 5)
-
 Title.BackgroundTransparency = 1
-
 Title.Text = "Minha GUI"
-
-Title.TextColor3 =
-	Color3.fromRGB(255, 255, 255)
-
+Title.TextColor3 = Color3.new(1, 1, 1)
 Title.TextSize = 20
 Title.Font = Enum.Font.GothamBold
-
-Title.TextXAlignment =
-	Enum.TextXAlignment.Left
-
+Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = MainFrame
 
 --==================================================
@@ -117,39 +92,25 @@ Title.Parent = MainFrame
 --==================================================
 
 local Sidebar = Instance.new("Frame")
-
-Sidebar.Size = UDim2.fromOffset(115, 355)
+Sidebar.Size = UDim2.fromOffset(115, 375)
 Sidebar.Position = UDim2.fromOffset(10, 58)
-
-Sidebar.BackgroundColor3 =
-	Color3.fromRGB(32, 32, 40)
-
+Sidebar.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
 Sidebar.BorderSizePixel = 0
-
 Sidebar.Parent = MainFrame
 
 AddCorner(Sidebar, 10)
 
 --==================================================
--- ÁREA DE CONTEÚDO
+-- CONTEÚDO
 --==================================================
 
 local Content = Instance.new("ScrollingFrame")
-
-Content.Size =
-	UDim2.new(1, -140, 1, -70)
-
-Content.Position =
-	UDim2.fromOffset(130, 58)
-
+Content.Size = UDim2.new(1, -140, 1, -70)
+Content.Position = UDim2.fromOffset(130, 58)
 Content.BackgroundTransparency = 1
 Content.BorderSizePixel = 0
-
 Content.ScrollBarThickness = 4
-
-Content.CanvasSize =
-	UDim2.new(0, 0, 0, 500)
-
+Content.CanvasSize = UDim2.new(0, 0, 0, 500)
 Content.Parent = MainFrame
 
 --==================================================
@@ -157,41 +118,27 @@ Content.Parent = MainFrame
 --==================================================
 
 local function ClearContent()
-
 	for _, object in ipairs(Content:GetChildren()) do
 		object:Destroy()
 	end
-
 end
 
 --==================================================
--- TÍTULO DAS ABAS
+-- TÍTULO DA ABA
 --==================================================
 
 local function CreatePageTitle(text)
 
-	local Label = Instance.new("TextLabel")
-
-	Label.Size =
-		UDim2.new(1, -10, 0, 35)
-
-	Label.Position =
-		UDim2.fromOffset(5, 5)
-
-	Label.BackgroundTransparency = 1
-
-	Label.Text = text
-
-	Label.TextColor3 =
-		Color3.fromRGB(255, 255, 255)
-
-	Label.TextSize = 17
-	Label.Font = Enum.Font.GothamBold
-
-	Label.TextXAlignment =
-		Enum.TextXAlignment.Left
-
-	Label.Parent = Content
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(1, -10, 0, 35)
+	label.Position = UDim2.fromOffset(5, 5)
+	label.BackgroundTransparency = 1
+	label.Text = text
+	label.TextColor3 = Color3.new(1, 1, 1)
+	label.TextSize = 17
+	label.Font = Enum.Font.GothamBold
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.Parent = Content
 
 end
 
@@ -207,31 +154,20 @@ local Categories = {
 
 local CategoryButtons = {}
 
-local function CreateCategoryButton(name, order)
+for i, name in ipairs(Categories) do
 
 	local Button = Instance.new("TextButton")
 
-	Button.Size =
-		UDim2.new(1, -16, 0, 40)
-
+	Button.Size = UDim2.new(1, -16, 0, 40)
 	Button.Position =
-		UDim2.new(
-			0,
-			8,
-			0,
-			10 + ((order - 1) * 50)
-		)
+		UDim2.new(0, 8, 0, 10 + ((i - 1) * 50))
 
 	Button.BackgroundColor3 =
 		Color3.fromRGB(45, 45, 55)
 
 	Button.BorderSizePixel = 0
-
 	Button.Text = name
-
-	Button.TextColor3 =
-		Color3.fromRGB(255, 255, 255)
-
+	Button.TextColor3 = Color3.new(1, 1, 1)
 	Button.TextSize = 13
 	Button.Font = Enum.Font.Gotham
 
@@ -241,10 +177,6 @@ local function CreateCategoryButton(name, order)
 
 	CategoryButtons[name] = Button
 
-end
-
-for i, name in ipairs(Categories) do
-	CreateCategoryButton(name, i)
 end
 
 --==================================================
@@ -258,25 +190,21 @@ local function OpenMain()
 	CreatePageTitle("Players no Servidor")
 
 	--==================================================
-	-- LISTA COM ROLAGEM
+	-- LISTA DE PLAYERS
 	--==================================================
 
 	local PlayerList = Instance.new("ScrollingFrame")
 
 	PlayerList.Size =
-		UDim2.new(1, -10, 0, 195)
+		UDim2.new(1, -10, 0, 190)
 
 	PlayerList.Position =
 		UDim2.fromOffset(5, 42)
 
 	PlayerList.BackgroundTransparency = 1
-
 	PlayerList.BorderSizePixel = 0
 
 	PlayerList.ScrollBarThickness = 5
-
-	PlayerList.ScrollBarImageTransparency = 0.2
-
 	PlayerList.ScrollingDirection =
 		Enum.ScrollingDirection.Y
 
@@ -284,8 +212,6 @@ local function OpenMain()
 		UDim2.new(0, 0, 0, 0)
 
 	PlayerList.Parent = Content
-
-	-- Layout da lista
 
 	local PlayerLayout = Instance.new("UIListLayout")
 
@@ -298,70 +224,60 @@ local function OpenMain()
 	PlayerLayout.Parent = PlayerList
 
 	--==================================================
-	-- ATUALIZAR JOGADORES
+	-- ATUALIZAR PLAYERS
 	--==================================================
 
 	local function UpdatePlayers()
 
 		for _, object in ipairs(PlayerList:GetChildren()) do
-
 			if object:IsA("TextButton") then
 				object:Destroy()
 			end
-
 		end
 
 		for _, target in ipairs(Players:GetPlayers()) do
 
 			if target ~= LocalPlayer then
 
-				local PlayerButton =
-					Instance.new("TextButton")
+				local Button = Instance.new("TextButton")
 
-				PlayerButton.Size =
+				Button.Size =
 					UDim2.new(1, -5, 0, 34)
 
-				PlayerButton.BackgroundColor3 =
+				Button.BackgroundColor3 =
 					Color3.fromRGB(45, 45, 55)
 
-				PlayerButton.BorderSizePixel = 0
+				Button.BorderSizePixel = 0
 
-				PlayerButton.Text =
+				Button.Text =
 					target.Name
 
-				PlayerButton.TextColor3 =
-					Color3.fromRGB(255, 255, 255)
+				Button.TextColor3 =
+					Color3.new(1, 1, 1)
 
-				PlayerButton.TextSize = 13
+				Button.TextSize = 13
+				Button.Font = Enum.Font.Gotham
 
-				PlayerButton.Font =
-					Enum.Font.Gotham
+				Button.Parent = PlayerList
 
-				PlayerButton.Parent =
-					PlayerList
+				AddCorner(Button, 8)
 
-				AddCorner(PlayerButton, 8)
-
-				-- Selecionar jogador
-
-				PlayerButton.MouseButton1Click:Connect(function()
+				Button.MouseButton1Click:Connect(function()
 
 					selectedPlayer = target
 
-					for _, button in ipairs(
+					for _, other in ipairs(
 						PlayerList:GetChildren()
 					) do
 
-						if button:IsA("TextButton") then
-
-							button.BackgroundColor3 =
+						if other:IsA("TextButton") then
+							other.BackgroundColor3 =
 								Color3.fromRGB(45, 45, 55)
-
 						end
 
 					end
 
-					PlayerButton.BackgroundColor3 =
+					Button.BackgroundColor3 =
 						Color3.fromRGB(0, 120, 215)
 
 				end)
@@ -369,8 +285,6 @@ local function OpenMain()
 			end
 
 		end
-
-		-- Atualiza tamanho da rolagem
 
 		task.wait()
 
@@ -390,14 +304,13 @@ local function OpenMain()
 	-- BOTÃO SEGUIR
 	--==================================================
 
-	local FollowButton =
-		Instance.new("TextButton")
+	local FollowButton = Instance.new("TextButton")
 
 	FollowButton.Size =
 		UDim2.new(1, -10, 0, 38)
 
 	FollowButton.Position =
-		UDim2.fromOffset(5, 255)
+		UDim2.fromOffset(5, 245)
 
 	FollowButton.BackgroundColor3 =
 		Color3.fromRGB(0, 140, 255)
@@ -408,20 +321,17 @@ local function OpenMain()
 		"Seguir Player"
 
 	FollowButton.TextColor3 =
-		Color3.fromRGB(255, 255, 255)
+		Color3.new(1, 1, 1)
 
 	FollowButton.TextSize = 14
+	FollowButton.Font = Enum.Font.GothamBold
 
-	FollowButton.Font =
-		Enum.Font.GothamBold
-
-	FollowButton.Parent =
-		Content
+	FollowButton.Parent = Content
 
 	AddCorner(FollowButton, 8)
 
 	--==================================================
-	-- FUNÇÃO SEGUIR
+	-- SEGUIR
 	--==================================================
 
 	FollowButton.MouseButton1Click:Connect(function()
@@ -437,7 +347,6 @@ local function OpenMain()
 				"Seguir Player"
 
 			return
-
 		end
 
 		following = not following
@@ -450,19 +359,9 @@ local function OpenMain()
 			FollowButton.BackgroundColor3 =
 				Color3.fromRGB(200, 50, 50)
 
-			-- Evita conexão duplicada
-
 			if followConnection then
-
 				followConnection:Disconnect()
-
-				followConnection = nil
-
 			end
-
-			--==================================================
-			-- MOVIMENTO SUAVE
-			--==================================================
 
 			followConnection =
 				RunService.Heartbeat:Connect(function()
@@ -471,47 +370,45 @@ local function OpenMain()
 						return
 					end
 
-					if not selectedPlayer then
+					if not selectedPlayer
+						or not selectedPlayer.Parent then
+
+						following = false
 						return
 					end
 
-					local MyCharacter =
+					local myCharacter =
 						LocalPlayer.Character
 
-					local TargetCharacter =
+					local targetCharacter =
 						selectedPlayer.Character
 
-					if not MyCharacter
-						or not TargetCharacter then
-
+					if not myCharacter
+						or not targetCharacter then
 						return
-
 					end
 
-					local MyRoot =
-						MyCharacter:FindFirstChild(
+					local myRoot =
+						myCharacter:FindFirstChild(
 							"HumanoidRootPart"
 						)
 
-					local TargetRoot =
-						TargetCharacter:FindFirstChild(
+					local targetRoot =
+						targetCharacter:FindFirstChild(
 							"HumanoidRootPart"
 						)
 
-					if not MyRoot
-						or not TargetRoot then
-
+					if not myRoot
+						or not targetRoot then
 						return
-
 					end
 
-					-- Distância do jogador
-
+					-- Distância que ficará do jogador
 					local Distance = 5
 
 					local Difference =
-						MyRoot.Position -
-						TargetRoot.Position
+						myRoot.Position -
+						targetRoot.Position
 
 					if Difference.Magnitude < 0.01 then
 						return
@@ -521,20 +418,31 @@ local function OpenMain()
 						Difference.Unit
 
 					local TargetPosition =
-						TargetRoot.Position
-						+ Direction * Distance
+						targetRoot.Position +
+						Direction * Distance
 
 					--==================================================
-					-- TWEEN SUAVE
+					-- TWEEN SPEED
 					--==================================================
+					--
+					-- Este valor controla SOMENTE a velocidade
+					-- do movimento de seguir.
+					--
+					-- 0.01 = extremamente lento
+					-- 0.03 = muito lento
+					-- 0.05 = lento
+					-- 0.10 = médio
+					-- 0.20 = rápido
+					-- 0.50 = muito rápido
+					--
 
-					MyRoot.CFrame =
-						MyRoot.CFrame:Lerp(
+					myRoot.CFrame =
+						myRoot.CFrame:Lerp(
 							CFrame.new(
 								TargetPosition,
-								TargetRoot.Position
+								targetRoot.Position
 							),
-							0.035
+							TweenSpeed
 						)
 
 				end)
@@ -548,11 +456,8 @@ local function OpenMain()
 				Color3.fromRGB(0, 140, 255)
 
 			if followConnection then
-
 				followConnection:Disconnect()
-
 				followConnection = nil
-
 			end
 
 		end
@@ -560,7 +465,197 @@ local function OpenMain()
 	end)
 
 	--==================================================
-	-- CAIXA DE VELOCIDADE
+	-- TWEEN SPEED
+	--==================================================
+
+	local TweenLabel = Instance.new("TextLabel")
+
+	TweenLabel.Size =
+		UDim2.new(1, -10, 0, 25)
+
+	TweenLabel.Position =
+		UDim2.fromOffset(5, 295)
+
+	TweenLabel.BackgroundTransparency = 1
+
+	TweenLabel.Text =
+		"Tween Speed: " ..
+		string.format("%.2f", TweenSpeed)
+
+	TweenLabel.TextColor3 =
+		Color3.fromRGB(255, 255, 255)
+
+	TweenLabel.TextSize = 13
+	TweenLabel.Font = Enum.Font.GothamBold
+
+	TweenLabel.TextXAlignment =
+		Enum.TextXAlignment.Left
+
+	TweenLabel.Parent = Content
+
+	--==================================================
+	-- SLIDER DO TWEEN
+	--==================================================
+
+	local SliderBackground =
+		Instance.new("Frame")
+
+	SliderBackground.Size =
+		UDim2.new(1, -10, 0, 10)
+
+	SliderBackground.Position =
+		UDim2.fromOffset(5, 325)
+
+	SliderBackground.BackgroundColor3 =
+		Color3.fromRGB(50, 50, 58)
+
+	SliderBackground.BorderSizePixel = 0
+
+	SliderBackground.Parent = Content
+
+	AddCorner(SliderBackground, 10)
+
+	local SliderFill =
+		Instance.new("Frame")
+
+	SliderFill.Size =
+		UDim2.new(
+			TweenSpeed / 0.5,
+			0,
+			1,
+			0
+		)
+
+	SliderFill.BackgroundColor3 =
+		Color3.fromRGB(0, 140, 255)
+
+	SliderFill.BorderSizePixel = 0
+	SliderFill.Parent = SliderBackground
+
+	AddCorner(SliderFill, 10)
+
+	local SliderButton =
+		Instance.new("TextButton")
+
+	SliderButton.Size =
+		UDim2.fromOffset(20, 20)
+
+	SliderButton.AnchorPoint =
+		Vector2.new(0.5, 0.5)
+
+	SliderButton.Position =
+		UDim2.new(
+			TweenSpeed / 0.5,
+			0,
+			0.5,
+			0
+		)
+
+	SliderButton.BackgroundColor3 =
+		Color3.fromRGB(255, 255, 255)
+
+	SliderButton.Text = ""
+	SliderButton.BorderSizePixel = 0
+
+	SliderButton.Parent =
+		SliderBackground
+
+	AddCorner(SliderButton, 100)
+
+	--==================================================
+	-- CONTROLE DO SLIDER
+	--==================================================
+
+	local sliderDragging = false
+
+	local function UpdateTweenSlider(x)
+
+		local relative =
+			math.clamp(
+				(x - SliderBackground.AbsolutePosition.X)
+				/ SliderBackground.AbsoluteSize.X,
+				0,
+				1
+			)
+
+		-- mínimo 0.01 / máximo 0.50
+		TweenSpeed =
+			math.clamp(
+				relative * 0.5,
+				0.01,
+				0.5
+			)
+
+		local normalized =
+			TweenSpeed / 0.5
+
+		SliderFill.Size =
+			UDim2.new(
+				normalized,
+				0,
+				1,
+				0
+			)
+
+		SliderButton.Position =
+			UDim2.new(
+				normalized,
+				0,
+				0.5,
+				0
+			)
+
+		TweenLabel.Text =
+			"Tween Speed: " ..
+			string.format("%.2f", TweenSpeed)
+
+	end
+
+	SliderButton.InputBegan:Connect(function(input)
+
+		if input.UserInputType ==
+			Enum.UserInputType.MouseButton1
+			or input.UserInputType ==
+			Enum.UserInputType.Touch then
+
+			sliderDragging = true
+
+		end
+
+	end)
+
+	UserInputService.InputEnded:Connect(function(input)
+
+		if input.UserInputType ==
+			Enum.UserInputType.MouseButton1
+			or input.UserInputType ==
+			Enum.UserInputType.Touch then
+
+			sliderDragging = false
+
+		end
+
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+
+		if not sliderDragging then
+			return
+		end
+
+		if input.UserInputType ==
+			Enum.UserInputType.MouseMovement
+			or input.UserInputType ==
+			Enum.UserInputType.Touch then
+
+			UpdateTweenSlider(input.Position.X)
+
+		end
+
+	end)
+
+	--==================================================
+	-- WALK SPEED
 	--==================================================
 
 	local SpeedBox =
@@ -570,7 +665,7 @@ local function OpenMain()
 		UDim2.new(0.55, 0, 0, 35)
 
 	SpeedBox.Position =
-		UDim2.fromOffset(5, 305)
+		UDim2.fromOffset(5, 350)
 
 	SpeedBox.BackgroundColor3 =
 		Color3.fromRGB(40, 40, 48)
@@ -580,25 +675,22 @@ local function OpenMain()
 	SpeedBox.Text = "16"
 
 	SpeedBox.PlaceholderText =
-		"0 - 100"
+		"WalkSpeed 0-100"
 
 	SpeedBox.TextColor3 =
-		Color3.fromRGB(255, 255, 255)
+		Color3.new(1, 1, 1)
 
 	SpeedBox.TextSize = 13
-
-	SpeedBox.Font =
-		Enum.Font.Gotham
+	SpeedBox.Font = Enum.Font.Gotham
 
 	SpeedBox.ClearTextOnFocus = false
 
-	SpeedBox.Parent =
-		Content
+	SpeedBox.Parent = Content
 
 	AddCorner(SpeedBox, 8)
 
 	--==================================================
-	-- BOTÃO APLICAR VELOCIDADE
+	-- APLICAR WALKSPEED
 	--==================================================
 
 	local ApplyButton =
@@ -608,7 +700,7 @@ local function OpenMain()
 		UDim2.new(0.35, 0, 0, 35)
 
 	ApplyButton.Position =
-		UDim2.new(0.62, 0, 0, 305)
+		UDim2.new(0.62, 0, 0, 350)
 
 	ApplyButton.BackgroundColor3 =
 		Color3.fromRGB(0, 170, 80)
@@ -619,15 +711,12 @@ local function OpenMain()
 		"Aplicar"
 
 	ApplyButton.TextColor3 =
-		Color3.fromRGB(255, 255, 255)
+		Color3.new(1, 1, 1)
 
 	ApplyButton.TextSize = 13
+	ApplyButton.Font = Enum.Font.GothamBold
 
-	ApplyButton.Font =
-		Enum.Font.GothamBold
-
-	ApplyButton.Parent =
-		Content
+	ApplyButton.Parent = Content
 
 	AddCorner(ApplyButton, 8)
 
@@ -656,21 +745,18 @@ local function OpenMain()
 			)
 
 		if Humanoid then
-
-			Humanoid.WalkSpeed =
-				Value
-
+			Humanoid.WalkSpeed = Value
 		end
 
 	end)
 
 	Content.CanvasSize =
-		UDim2.new(0, 0, 0, 360)
+		UDim2.new(0, 0, 0, 400)
 
 end
 
 --==================================================
--- ABA CONFIGURAÇÕES
+-- CONFIGURAÇÕES
 --==================================================
 
 local function OpenSettings()
@@ -685,7 +771,7 @@ local function OpenSettings()
 		Instance.new("TextLabel")
 
 	Info.Size =
-		UDim2.new(1, -10, 0, 90)
+		UDim2.new(1, -10, 0, 100)
 
 	Info.Position =
 		UDim2.fromOffset(5, 50)
@@ -696,36 +782,30 @@ local function OpenSettings()
 	Info.BorderSizePixel = 0
 
 	Info.Text =
-		"Configurações da GUI\n\nUse as outras abas para acessar as funções."
+		"Configurações\n\nTween Speed controla a velocidade do movimento de seguir.\nWalkSpeed controla a velocidade do personagem."
 
 	Info.TextColor3 =
 		Color3.fromRGB(220, 220, 220)
 
-	Info.TextSize = 13
-
-	Info.Font =
-		Enum.Font.Gotham
-
+	Info.TextSize = 12
+	Info.Font = Enum.Font.Gotham
 	Info.TextWrapped = true
 
-	Info.Parent =
-		Content
+	Info.Parent = Content
 
 	AddCorner(Info, 8)
 
 end
 
 --==================================================
--- ABA SCRIPTS
+-- SCRIPTS
 --==================================================
 
 local function OpenScripts()
 
 	ClearContent()
 
-	CreatePageTitle(
-		"Scripts"
-	)
+	CreatePageTitle("Scripts")
 
 	local Info =
 		Instance.new("TextLabel")
@@ -742,20 +822,16 @@ local function OpenScripts()
 	Info.BorderSizePixel = 0
 
 	Info.Text =
-		"Área para adicionar seus próprios scripts."
+		"Área reservada para adicionar outros scripts."
 
 	Info.TextColor3 =
 		Color3.fromRGB(220, 220, 220)
 
 	Info.TextSize = 13
-
-	Info.Font =
-		Enum.Font.Gotham
-
+	Info.Font = Enum.Font.Gotham
 	Info.TextWrapped = true
 
-	Info.Parent =
-		Content
+	Info.Parent = Content
 
 	AddCorner(Info, 8)
 
@@ -777,14 +853,10 @@ CategoryButtons["Scripts"].MouseButton1Click:Connect(
 	OpenScripts
 )
 
---==================================================
--- ABRIR MAIN
---==================================================
-
 OpenMain()
 
 --==================================================
--- TOGGLE
+-- ABRIR / FECHAR
 --==================================================
 
 local GuiOpen = false
@@ -793,8 +865,7 @@ ToggleButton.MouseButton1Click:Connect(function()
 
 	GuiOpen = not GuiOpen
 
-	MainFrame.Visible =
-		GuiOpen
+	MainFrame.Visible = GuiOpen
 
 end)
 
