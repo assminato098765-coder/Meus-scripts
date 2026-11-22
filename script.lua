@@ -1,247 +1,210 @@
---// SODA SCRIPTS
---// Interface inspirada na imagem enviada
+-- Karpa Blox Fruits PvP (Silent Aim + Skills no Alvo)
+-- Executor: Delta, Xeno, Solara, Synapse
 
 local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+local Workspace = game:GetService("Workspace")
+local VirtualInputManager = game:GetService("VirtualInputManager")
 
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+local LocalPlayer = Players.LocalPlayer
+local Camera = Workspace.CurrentCamera
+local Mouse = LocalPlayer:GetMouse()
 
---// GUI
-local gui = Instance.new("ScreenGui")
-gui.Name = "SodaScripts"
-gui.ResetOnSpawn = false
-gui.Parent = playerGui
+local Config = {
+    ESP = true,
+    AimLock = true,
+    SkillAim = true, -- Força skills a irem no alvo
+    AimPart = "Head",
+    Speed = true,
+    SpeedValue = 50,
+    Jump = true,
+    JumpValue = 100,
+    AutoAttack = false,
+    AutoAttackDelay = 0.1,
+}
 
---// Janela principal
-local main = Instance.new("Frame")
-main.Name = "Main"
-main.Size = UDim2.new(0, 760, 0, 620)
-main.Position = UDim2.new(0.5, -380, 0.5, -310)
-main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-main.BorderSizePixel = 0
-main.Parent = gui
+-- Limpar UI antiga
+if CoreGui:FindFirstChild("KarpaPvP") then
+    CoreGui:FindFirstChild("KarpaPvP"):Destroy()
+end
 
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 16)
-corner.Parent = main
+-- UI Básica
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "KarpaPvP"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = CoreGui
 
-local stroke = Instance.new("UIStroke")
-stroke.Color = Color3.fromRGB(35, 35, 35)
-stroke.Thickness = 2
-stroke.Parent = main
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Parent = ScreenGui
+ToggleBtn.Size = UDim2.new(0, 200, 0, 50)
+ToggleBtn.Position = UDim2.new(0.5, -100, 0, 20)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.Font = Enum.Font.SourceSansBold
+ToggleBtn.TextSize = 20
+ToggleBtn.Text = "Karpa PvP: Menu"
+ToggleBtn.BorderSizePixel = 0
 
---// Título
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 70)
-title.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-title.BorderSizePixel = 0
-title.Text = "Soda Scripts"
-title.TextColor3 = Color3.fromRGB(255, 125, 15)
-title.TextSize = 27
-title.Font = Enum.Font.GothamBold
-title.Parent = main
+local MenuFrame = Instance.new("Frame")
+MenuFrame.Parent = ScreenGui
+MenuFrame.Size = UDim2.new(0, 250, 0, 400)
+MenuFrame.Position = UDim2.new(0.5, -125, 0, 80)
+MenuFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MenuFrame.Visible = true
+MenuFrame.BorderSizePixel = 0
 
-local titleCorner = Instance.new("UICorner")
-titleCorner.CornerRadius = UDim.new(0, 16)
-titleCorner.Parent = title
+Instance.new("UICorner", MenuFrame).CornerRadius = UDim.new(0, 8)
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = MenuFrame
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 5)
 
---// Velocidade
-local speedBox = Instance.new("Frame")
-speedBox.Size = UDim2.new(1, -36, 0, 82)
-speedBox.Position = UDim2.new(0, 18, 0, 90)
-speedBox.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-speedBox.BorderSizePixel = 0
-speedBox.Parent = main
+local function createButton(text, callback)
+    local btn = Instance.new("TextButton")
+    btn.Parent = MenuFrame
+    btn.Size = UDim2.new(1, -20, 0, 30)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.SourceSans
+    btn.TextSize = 16
+    btn.Text = text
+    btn.BorderSizePixel = 0
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
+    btn.MouseButton1Click:Connect(callback)
+    return btn
+end
 
-local speedCorner = Instance.new("UICorner")
-speedCorner.CornerRadius = UDim.new(0, 14)
-speedCorner.Parent = speedBox
+-- ESP System
+local ESP_List = {}
+local function createESP(player)
+    if player == LocalPlayer or ESP_List[player] then return end
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "KarpaESP_" .. player.Name
+    highlight.Adornee = player.Character
+    highlight.FillColor = Color3.fromRGB(255, 0, 0)
+    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+    highlight.FillTransparency = 0.5
+    highlight.OutlineTransparency = 0
+    highlight.Parent = player.Character
+    ESP_List[player] = highlight
+end
 
-local speedText = Instance.new("TextLabel")
-speedText.Size = UDim2.new(0.55, 0, 1, 0)
-speedText.Position = UDim2.new(0, 25, 0, 0)
-speedText.BackgroundTransparency = 1
-speedText.Text = "Velocity Speed"
-speedText.TextColor3 = Color3.fromRGB(230, 230, 230)
-speedText.TextSize = 21
-speedText.Font = Enum.Font.Gotham
-speedText.TextXAlignment = Enum.TextXAlignment.Left
-speedText.Parent = speedBox
-
-local speedInput = Instance.new("TextBox")
-speedInput.Size = UDim2.new(0, 215, 0, 58)
-speedInput.Position = UDim2.new(1, -235, 0.5, -29)
-speedInput.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-speedInput.BorderSizePixel = 0
-speedInput.Text = "20"
-speedInput.TextColor3 = Color3.fromRGB(255, 95, 10)
-speedInput.TextSize = 21
-speedInput.Font = Enum.Font.GothamBold
-speedInput.ClearTextOnFocus = false
-speedInput.Parent = speedBox
-
-local inputCorner = Instance.new("UICorner")
-inputCorner.CornerRadius = UDim.new(0, 10)
-inputCorner.Parent = speedInput
-
---// Modo
-local mode = Instance.new("TextLabel")
-mode.Size = UDim2.new(1, -36, 0, 80)
-mode.Position = UDim2.new(0, 18, 0, 190)
-mode.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-mode.BorderSizePixel = 0
-mode.Text = "Mode: Kill Players"
-mode.TextColor3 = Color3.fromRGB(255, 125, 15)
-mode.TextSize = 23
-mode.Font = Enum.Font.GothamBold
-mode.Parent = main
-
-local modeCorner = Instance.new("UICorner")
-modeCorner.CornerRadius = UDim.new(0, 14)
-modeCorner.Parent = mode
-
---// Função para criar opção
-local function createToggle(name, x, y)
-
-    local box = Instance.new("Frame")
-    box.Size = UDim2.new(0.47, 0, 0, 82)
-    box.Position = UDim2.new(x, 0, 0, y)
-    box.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-    box.BorderSizePixel = 0
-    box.Parent = main
-
-    local boxCorner = Instance.new("UICorner")
-    boxCorner.CornerRadius = UDim.new(0, 14)
-    boxCorner.Parent = box
-
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0, 40, 0, 40)
-    button.Position = UDim2.new(0, 18, 0.5, -20)
-    button.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-    button.BorderSizePixel = 0
-    button.Text = ""
-    button.Parent = box
-
-    local buttonCorner = Instance.new("UICorner")
-    buttonCorner.CornerRadius = UDim.new(0, 8)
-    buttonCorner.Parent = button
-
-    local buttonStroke = Instance.new("UIStroke")
-    buttonStroke.Color = Color3.fromRGB(255, 70, 15)
-    buttonStroke.Thickness = 2
-    buttonStroke.Parent = button
-
-    local check = Instance.new("TextLabel")
-    check.Size = UDim2.new(1, 0, 1, 0)
-    check.BackgroundTransparency = 1
-    check.Text = ""
-    check.TextColor3 = Color3.fromRGB(255, 255, 255)
-    check.TextSize = 25
-    check.Font = Enum.Font.GothamBold
-    check.Parent = button
-
-    local text = Instance.new("TextLabel")
-    text.Size = UDim2.new(1, -75, 1, 0)
-    text.Position = UDim2.new(0, 68, 0, 0)
-    text.BackgroundTransparency = 1
-    text.Text = name
-    text.TextColor3 = Color3.fromRGB(225, 225, 225)
-    text.TextSize = 20
-    text.Font = Enum.Font.Gotham
-    text.TextXAlignment = Enum.TextXAlignment.Left
-    text.Parent = box
-
-    local enabled = false
-
-    button.MouseButton1Click:Connect(function()
-
-        enabled = not enabled
-
-        if enabled then
-            button.BackgroundColor3 = Color3.fromRGB(255, 90, 15)
-            check.Text = "✓"
-        else
-            button.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-            check.Text = ""
-        end
-
-        print(name, enabled)
-    end)
-
-    return function()
-        return enabled
+local function removeESP(player)
+    if ESP_List[player] then
+        ESP_List[player]:Destroy()
+        ESP_List[player] = nil
     end
 end
 
---// Opções
-local getAutoFarm = createToggle("Auto Farm", 0.025, 290)
-local getNoclip = createToggle("Noclip", 0.515, 290)
+local function onCharacterAdded(player, character)
+    if Config.ESP then createESP(player) end
+end
 
-local getSafeMode = createToggle("Safe Mode", 0.025, 390)
-local getAntiAFK = createToggle("Anti-AFK", 0.515, 390)
+for _, player in ipairs(Players:GetPlayers()) do
+    if player.Character then onCharacterAdded(player, player.Character) end
+    player.CharacterAdded:Connect(function(char) onCharacterAdded(player, char) end)
+end
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(char) onCharacterAdded(player, char) end)
+end)
+Players.PlayerRemoving:Connect(removeESP)
 
---// Arrastar janela
-local UserInputService = game:GetService("UserInputService")
+-- Alvo Atual (AimLock)
+local CurrentTarget = nil
 
-local dragging = false
-local dragStart
-local startPos
-
-title.InputBegan:Connect(function(input)
-
-    if input.UserInputType == Enum.UserInputType.MouseButton1
-        or input.UserInputType == Enum.UserInputType.Touch then
-
-        dragging = true
-        dragStart = input.Position
-        startPos = main.Position
-
-        input.Changed:Connect(function()
-
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
+local function getClosestPlayer()
+    local closest = nil
+    local shortestDist = math.huge
+    local center = Camera.ViewportSize / 2
+    
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health > 0 then
+            local part = player.Character:FindFirstChild(Config.AimPart) or player.Character.HumanoidRootPart
+            local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
+            
+            if onScreen then
+                local dist = (Vector2.new(screenPos.X, screenPos.Y) - center).Magnitude
+                if dist < shortestDist then
+                    shortestDist = dist
+                    closest = player
+                end
             end
-
-        end)
+        end
     end
-end)
+    return closest
+end
 
-UserInputService.InputChanged:Connect(function(input)
-
-    if dragging and (
-        input.UserInputType == Enum.UserInputType.MouseMovement
-        or input.UserInputType == Enum.UserInputType.Touch
-    ) then
-
-        local delta = input.Position - dragStart
-
-        main.Position = UDim2.new(
-            startPos.X.Scale,
-            startPos.X.Offset + delta.X,
-            startPos.Y.Scale,
-            startPos.Y.Offset + delta.Y
-        )
-    end
-end)
-
---// Alterar velocidade local
-speedInput.FocusLost:Connect(function()
-
-    local value = tonumber(speedInput.Text)
-
-    if value then
-        value = math.clamp(value, 0, 200)
-
-        speedInput.Text = tostring(value)
-
-        local character = player.Character
-        local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-
-        if humanoid then
-            humanoid.WalkSpeed = value
+-- Camera e Silent Aim Loop
+RunService.RenderStepped:Connect(function()
+    if Config.AimLock then
+        CurrentTarget = getClosestPlayer()
+        if CurrentTarget and CurrentTarget.Character then
+            local part = CurrentTarget.Character:FindFirstChild(Config.AimPart) or CurrentTarget.Character.HumanoidRootPart
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, part.Position)
         end
     else
-        speedInput.Text = "20"
+        CurrentTarget = nil
+    end
+
+    -- Força o mouse a ficar no alvo para as skills irem nele
+    if Config.SkillAim and CurrentTarget and CurrentTarget.Character then
+        local part = CurrentTarget.Character:FindFirstChild(Config.AimPart) or CurrentTarget.Character.HumanoidRootPart
+        -- O truque está aqui: move o mouse (Hit) para a posição 3D do inimigo
+        Mouse.TargetFilter = CurrentTarget.Character
+        mousemoverel(0, 0) -- Força atualização do mouse
+        -- Se o seu executor suportar, isso engana o jogo
+        local pos = Camera:WorldToViewportPoint(part.Position)
+        VirtualInputManager:SendMouseMoveEvent(pos.X, pos.Y, game)
     end
 end)
+
+-- Auto Attack
+local autoAttackConnection
+local function toggleAutoAttack()
+    Config.AutoAttack = not Config.AutoAttack
+    if Config.AutoAttack then
+        autoAttackConnection = RunService.Heartbeat:Connect(function()
+            if Config.AutoAttack and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character.Humanoid.Health > 0 then
+                VirtualInputManager:SendMouseButtonEvent(Mouse.X, Mouse.Y, 0, true, game, 1)
+                task.wait(Config.AutoAttackDelay)
+                VirtualInputManager:SendMouseButtonEvent(Mouse.X, Mouse.Y, 0, false, game, 1)
+            end
+        end)
+    else
+        if autoAttackConnection then autoAttackConnection:Disconnect() end
+    end
+end
+
+-- Movimento
+RunService.Heartbeat:Connect(function()
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        local hum = LocalPlayer.Character.Humanoid
+        if Config.Speed then hum.WalkSpeed = Config.SpeedValue end
+        if Config.Jump then hum.JumpPower = Config.JumpValue end
+    end
+end)
+
+-- UI Callbacks
+createButton("Toggle ESP", function()
+    Config.ESP = not Config.ESP
+    for _, p in ipairs(Players:GetPlayers()) do
+        if Config.ESP then if p.Character then createESP(p) end else removeESP(p) end
+    end
+end)
+
+createButton("Toggle AimLock", function() Config.AimLock = not Config.AimLock end)
+createButton("Toggle Skill Aim (Mira)", function() Config.SkillAim = not Config.SkillAim end)
+createButton("Toggle Speed (50)", function() Config.Speed = not Config.Speed end)
+createButton("Toggle Jump (100)", function() Config.Jump = not Config.Jump end)
+createButton("Toggle Auto Attack", function() toggleAutoAttack() end)
+
+createButton("TP to Closest Player", function()
+    local target = getClosestPlayer()
+    if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
+    end
+end)
+
+ToggleBtn.MouseButton1Click:Connect(function() MenuFrame.Visible = not MenuFrame.Visible end)
